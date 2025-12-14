@@ -1,0 +1,88 @@
+{% extends "customer/base_customer.html" %}
+{% from 'shared/_status_badge.html' import status_badge %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Order #{{ order.id }}</h2>
+    {{ status_badge(order.status) }}
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">Items</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0 table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>File</th>
+                            <th>Details</th>
+                            <th>Status</th>
+                            <th class="text-end">Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for job in order.jobs %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold">{{ job.original_filename }}</div>
+                                <small class="text-muted">{{ job.material_type }} - {{ job.color }}</small>
+                            </td>
+                            <td>
+                                <small>Est. Time: {{ job.estimated_time_minutes }}m</small><br>
+                                <small>Est. Grams: {{ job.estimated_material_grams }}g</small>
+                            </td>
+                            <td>{{ status_badge(job.status) }}</td>
+                            <td class="text-end">{{ job.quantity }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Date:</span>
+                    <span class="fw-bold">{{ order.created_at.strftime('%Y-%m-%d') }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Total Items:</span>
+                    <span class="fw-bold">{{ order.jobs|length }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Est. Total:</span>
+                    <span class="fw-bold text-primary fs-5">${{ order.total_estimated_price }}</span>
+                </div>
+
+                <hr>
+
+                <h6>Shipping Address</h6>
+                <address class="text-muted mb-0">
+                    {{ order.shipping_address }}
+                </address>
+
+                {% if order.shipment %}
+                <hr>
+                <h6>Shipment Info</h6>
+                <p class="mb-0">
+                    <strong>Carrier:</strong> {{ order.shipment.carrier }}<br>
+                    <strong>Tracking:</strong> {{ order.shipment.tracking_number }}<br>
+                    <strong>Sent:</strong> {{ order.shipment.shipped_at.strftime('%Y-%m-%d') }}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{{ url_for('customer.orders') }}" class="btn btn-outline-secondary w-100">Back to Orders</a>
+    </div>
+</div>
+{% endblock %}

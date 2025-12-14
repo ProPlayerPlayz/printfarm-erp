@@ -1,0 +1,78 @@
+{% extends "customer/base_customer.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow border-0 mt-3 mb-5">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-4">Create Account</h3>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    {% include 'shared/_form_errors.html' %}
+
+                    <h5 class="mb-3 border-bottom pb-2">Login Details</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.confirm_password.label(class="form-label") }}
+                            {{ form.confirm_password(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3 border-bottom pb-2">Contact & Shipping</h5>
+                    <div class="mb-3">
+                        {{ form.phone.label(class="form-label") }}
+                        {{ form.phone(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.address_line1.label(class="form-label") }}
+                        {{ form.address_line1(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.address_line2.label(class="form-label") }}
+                        {{ form.address_line2(class="form-control") }}
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.city.label(class="form-label") }}
+                            {{ form.city(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.state.label(class="form-label") }}
+                            {{ form.state(class="form-control") }}
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            {{ form.pincode.label(class="form-label") }}
+                            {{ form.pincode(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.country.label(class="form-label") }}
+                            {{ form.country(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

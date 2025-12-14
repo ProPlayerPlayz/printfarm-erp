@@ -1,0 +1,35 @@
+{% extends "internal/base_internal.html" %}
+
+{% block content %}
+<h2 class="mb-4">Audit Log</h2>
+
+<div class="table-responsive bg-white shadow-sm rounded">
+    <table class="table table-sm table-striped">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Actor</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs.items %}
+            <tr>
+                <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>{{ log.actor.name if log.actor else 'System' }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.entity_type }} #{{ log.entity_id }}</td>
+                <td class="text-muted small">
+                    {% if log.before_json %}Before: {{ log.before_json }}<br>{% endif %}
+                    {% if log.after_json %}After: {{ log.after_json }}{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination could go here -->
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends "internal/base_internal.html" %}
+{% from 'shared/_status_badge.html' import status_badge %}
+
+{% block content %}
+<h2 class="mb-4">Job Queue Management</h2>
+
+<!-- Waiting Jobs -->
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 text-warning"><i class="bi bi-hourglass-split"></i> Waiting to be Assigned</h5>
+    </div>
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Job ID</th>
+                    <th>File</th>
+                    <th>Material</th>
+                    <th>Est. Time</th>
+                    <th>Assign To</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in waiting_jobs %}
+                <tr>
+                    <td>#{{ job.id }} <small class="text-muted">(Order #{{ job.order_id }})</small></td>
+                    <td><a href="#">{{ job.original_filename }}</a></td>
+                    <td>{{ job.material_type }} - {{ job.color }}</td>
+                    <td>{{ job.estimated_time_minutes }}m</td>
+                    <td>
+                        <form action="{{ url_for('operator.job_action', job_id=job.id) }}" method="POST" class="d-flex">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <input type="hidden" name="action" value="assign">
+                            <select name="printer_id" class="form-select form-select-sm me-2" required>
+                                <option value="">Select Printer...</option>
+                                {% for p in printers %}
+                                <option value="{{ p.id }}">{{ p.name }} ({{ p.status }})</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary">Assign</button>
+                        </form>
+                    </td>
+                    <td></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No waiting jobs.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Queued Jobs -->
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 text-primary"><i class="bi bi-collection"></i> Ready to Print (Queued)</h5>
+    </div>
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Job ID</th>
+                    <th>Printer</th>
+                    <th>File</th>
+                    <th>Material</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in queued_jobs %}
+                <tr>
+                    <td>#{{ job.id }}</td>
+                    <td>{{ job.printer.name }}</td>
+                    <td>{{ job.original_filename }}</td>
+                    <td>{{ job.material_type }} {{ job.color }}</td>
+                    <td>
+                        <form action="{{ url_for('operator.job_action', job_id=job.id) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <input type="hidden" name="action" value="start">
+                            <button type="submit" class="btn btn-sm btn-success">Start Order</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No queued jobs.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Printing Jobs -->
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 text-success"><i class="bi bi-printer-fill"></i> In Progress</h5>
+    </div>
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Job ID</th>
+                    <th>Printer</th>
+                    <th>File</th>
+                    <th>Started</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in printing_jobs %}
+                <tr>
+                    <td>#{{ job.id }}</td>
+                    <td>{{ job.printer.name }}</td>
+                    <td>{{ job.original_filename }}</td>
+                    <td>{{ job.order.created_at.strftime('%H:%M') }}</td> <!-- Placeholder -->
+                    <td>
+                        <div class="btn-group" role="group">
+                            <form action="{{ url_for('operator.job_action', job_id=job.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <input type="hidden" name="action" value="finish">
+                                <button type="submit"
+                                    class="btn btn-sm btn-success rounded-0 rounded-start">Done</button>
+                            </form>
+                            <form action="{{ url_for('operator.job_action', job_id=job.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <input type="hidden" name="action" value="fail">
+                                <button type="submit" class="btn btn-sm btn-danger rounded-0 rounded-end">Fail</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No jobs printing.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

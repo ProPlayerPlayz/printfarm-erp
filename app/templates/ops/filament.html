@@ -1,0 +1,50 @@
+{% extends "internal/base_internal.html" %}
+
+{% block content %}
+<h2 class="mb-4">Filament Inventory</h2>
+
+<div class="table-responsive bg-white shadow-sm p-3 rounded">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Material</th>
+                <th>Color</th>
+                <th>Current Stock (g)</th>
+                <th>Reorder Level</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in filaments %}
+            <tr>
+                <td>{{ f.id }}</td>
+                <td>{{ f.material_type }}</td>
+                <td>{{ f.color }}</td>
+                <td class="{{ 'text-danger fw-bold' if f.stock_grams <= f.reorder_level_grams }}">
+                    {{ f.stock_grams }}g
+                </td>
+                <td>{{ f.reorder_level_grams }}g</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#update{{ f.id }}">Update</button>
+                    <div class="collapse mt-2 position-absolute bg-white border p-3 shadow" style="z-index: 1000;"
+                        id="update{{ f.id }}">
+                        <form method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <input type="hidden" name="id" value="{{ f.id }}">
+                            <div class="mb-2">
+                                <label>New Stock (g):</label>
+                                <input type="number" name="stock_grams" value="{{ f.stock_grams }}"
+                                    class="form-control form-control-sm">
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

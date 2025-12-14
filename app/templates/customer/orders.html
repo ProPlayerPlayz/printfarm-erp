@@ -1,0 +1,43 @@
+{% extends "customer/base_customer.html" %}
+{% from 'shared/_status_badge.html' import status_badge %}
+
+{% block content %}
+<h2 class="mb-4">My Orders</h2>
+
+{% if orders %}
+<div class="table-responsive">
+    <table class="table table-hover bg-white border shadow-sm align-middle rounded">
+        <thead class="table-light">
+            <tr>
+                <th>Order #</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Items</th>
+                <th class="text-end">Est. Price</th>
+                <th class="text-end">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ status_badge(order.status) }}</td>
+                <td>{{ order.jobs|length }} items</td>
+                <td class="text-end fw-bold">${{ order.total_estimated_price }}</td>
+                <td class="text-end">
+                    <a href="{{ url_for('customer.order_detail', id=order.id) }}"
+                        class="btn btn-sm btn-outline-primary">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center py-5">
+    <p class="fs-4 text-muted">You haven't placed any orders yet.</p>
+    <a href="{{ url_for('customer.order_new') }}" class="btn btn-primary">Start Your First Order</a>
+</div>
+{% endif %}
+{% endblock %}

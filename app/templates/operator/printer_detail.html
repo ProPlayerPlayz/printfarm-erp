@@ -1,0 +1,50 @@
+{% extends "internal/base_internal.html" %}
+{% from 'shared/_status_badge.html' import status_badge %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ printer.name }}</h2>
+    {{ status_badge(printer.status) }}
+</div>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <h5>Details</h5>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Location:</strong> {{ printer.location }}</p>
+                <p><strong>Notes:</strong> {{ printer.notes or 'None' }}</p>
+            </div>
+            <div class="col-md-6">
+                <!-- Actions like maintenance mode toggle could go here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mb-3">Job History</h4>
+<table class="table table-hover shadow-sm bg-white">
+    <thead class="table-light">
+        <tr>
+            <th>Job ID</th>
+            <th>File</th>
+            <th>Status</th>
+            <th>Start/End</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for job in history %}
+        <tr>
+            <td>#{{ job.id }}</td>
+            <td>{{ job.original_filename }}</td>
+            <td>{{ status_badge(job.status) }}</td>
+            <td>{{ job.estimated_time_minutes }}m (Est)</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4" class="text-center">No history available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

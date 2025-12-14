@@ -1,0 +1,73 @@
+{% extends "internal/base_internal.html" %}
+
+{% block content %}
+<h1 class="mb-4">Operator Dashboard</h1>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Printing Now</h5>
+                <p class="card-text display-4">{{ active_jobs }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Queued Jobs</h5>
+                <p class="card-text display-4">{{ queued_jobs }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Active Printers</h5>
+                <p class="card-text display-4">{{ active_printers|length }} / {{ total_printers }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-danger mb-3 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Errors</h5>
+                <p class="card-text display-4">{{ error_printers }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="mb-3">Live Status</h3>
+<div class="row">
+    {% for printer in active_printers %}
+    <div class="col-md-4 mb-3">
+        <div class="card border-primary h-100 shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between">
+                <span>{{ printer.name }}</span>
+                <span class="badge bg-light text-primary">PRINTING</span>
+            </div>
+            <div class="card-body">
+                <h6 class="card-title">Job #{{ printer.current_job_id }}</h6>
+                <p class="card-text small">
+                    Location: {{ printer.location }}<br>
+                    {% set job = printer.jobs|selectattr("status", "equalto", "printing")|first %}
+                    {% if job %}
+                    File: {{ job.original_filename }}<br>
+                    Material: {{ job.material_type }} {{ job.color }}
+                    {% endif %}
+                </p>
+                <form action="{{ url_for('operator.job_action', job_id=printer.current_job_id) }}" method="POST"
+                    class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="action" value="finish">
+                    <button type="submit" class="btn btn-sm btn-success w-100">Mark Done</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-muted">No active printers printing.</div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "internal/base_internal.html" %}
+
+{% block content %}
+<h2 class="mb-4">Reorder Suggestions</h2>
+
+{% if suggestions.filaments %}
+<div class="card mb-4 shadow-sm border-danger">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">Low Filament Stock</h5>
+    </div>
+    <ul class="list-group list-group-flush">
+        {% for f in suggestions.filaments %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ f.material_type }} {{ f.color }}</strong>
+                <br>
+                <small class="text-muted">Current: {{ f.stock_grams }}g / Reorder: {{ f.reorder_level_grams }}g</small>
+            </div>
+            <span class="badge bg-danger rounded-pill">Low Stock</span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if suggestions.parts %}
+<div class="card shadow-sm border-warning">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0">Low Parts Stock</h5>
+    </div>
+    <ul class="list-group list-group-flush">
+        {% for p in suggestions.parts %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ p.name }}</strong>
+                <br>
+                <small class="text-muted">Current: {{ p.stock_qty }} / Reorder: {{ p.reorder_level_qty }}</small>
+            </div>
+            <span class="badge bg-warning text-dark rounded-pill">Low Stock</span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if not suggestions.filaments and not suggestions.parts %}
+<div class="alert alert-success">All inventory levels are healthy!</div>
+{% endif %}
+
+{% endblock %}

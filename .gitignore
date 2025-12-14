@@ -1,0 +1,28 @@
+# Python / Flask
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+instance/
+.pytest_cache/
+
+# Environment Variables
+.env
+
+# Database
+printfarm.db
+*.sqlite3
+
+# Uploads
+app/uploads/
+# Keep the directory structure but ignore content (except .gitkeep if we added it, but cleaner to ignore folder content)
+
+# OS Metadata
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/

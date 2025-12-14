@@ -1,0 +1,54 @@
+{% extends "customer/base_customer.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h4 class="mb-0 text-primary">Start New Order</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    {% include 'shared/_form_errors.html' %}
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">1. Upload Files</label>
+                        {{ form.stl_files(class="form-control") }}
+                        <div class="form-text">Select one or more .stl files.</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">2. Material</label>
+                            {{ form.material_type(class="form-select") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">3. Color</label>
+                            {{ form.color(class="form-select") }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">4. Quantity (per file)</label>
+                        {{ form.quantity(class="form-control", type="number") }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">5. Special Instructions</label>
+                        {{ form.notes(class="form-control", rows=3, placeholder="Any specific requirements...") }}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-light text-muted">
+                <i class="bi bi-info-circle"></i> Estimated price will be calculated after upload.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "internal/base_internal.html" %}
+
+{% block content %}
+<h2 class="mb-4">Shipments</h2>
+
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 text-primary">Orders Ready to Ship</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Address</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in ready_orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.customer.name }}</td>
+                        <td><small>{{ order.shipping_address }}</small></td>
+                        <td>
+                            <form method="POST" class="row g-2 align-items-center">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                <div class="col-auto">
+                                    <input type="text" name="carrier" class="form-control form-control-sm"
+                                        placeholder="Carrier (e.g. UPS)" required>
+                                </div>
+                                <div class="col-auto">
+                                    <input type="text" name="tracking" class="form-control form-control-sm"
+                                        placeholder="Tracking #" required>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-sm btn-success">Ship</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No orders ready to ship.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0">Recent Shipments</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Carrier</th>
+                    <th>Tracking</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in shipments %}
+                <tr>
+                    <td>#{{ s.order_id }}</td>
+                    <td>{{ s.carrier }}</td>
+                    <td>{{ s.tracking_number }}</td>
+                    <td>{{ s.shipped_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

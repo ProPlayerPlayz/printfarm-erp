@@ -1,0 +1,44 @@
+{% extends "customer/base_customer.html" %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold text-primary">Your Ideas, Printed.</h1>
+        <p class="col-md-8 fs-4">Welcome to our custom 3D printing service. Upload your STL files, get instant
+            estimates, and track your parts from our farm to your door.</p>
+        {% if not current_user.is_authenticated %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('auth.register_customer') }}" role="button">Get Started</a>
+        <a class="btn btn-outline-secondary btn-lg" href="{{ url_for('auth.login') }}" role="button">Login</a>
+        {% else %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('customer.order_new') }}" role="button"><i
+                class="bi bi-plus-lg"></i> Start New Order</a>
+        <a class="btn btn-outline-primary btn-lg" href="{{ url_for('customer.orders') }}" role="button">Track Orders</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row align-items-md-stretch">
+    <div class="col-md-4">
+        <div class="h-100 p-4 text-bg-dark rounded-3">
+            <h2>Process</h2>
+            <p>1. Upload STLs</p>
+            <p>2. Choose material & color</p>
+            <p>3. We print on our farm</p>
+            <p>4. Shipped to you</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="h-100 p-4 bg-light border rounded-3">
+            <h2>Materials</h2>
+            <p>We stock PLA, PETG, and ABS in various colors. Need something special? Contact us.</p>
+            <button class="btn btn-outline-dark" type="button">View Materials</button>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="h-100 p-4 bg-light border rounded-3">
+            <h2>Pricing</h2>
+            <p>Transparent pricing based on material weight and print time. No hidden fees.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "internal/base_internal.html" %}
+{% from 'shared/_status_badge.html' import status_badge %}
+
+{% block content %}
+<h2 class="mb-4">Printer Fleet</h2>
+
+<div class="row">
+    {% for printer in printers %}
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">{{ printer.name }}</h5>
+                    {{ status_badge(printer.status) }}
+                </div>
+                <h6 class="text-muted small text-uppercase">Location: {{ printer.location }}</h6>
+                <p class="card-text">
+                    {% if printer.status == 'printing' %}
+                    Currently printing Job #{{ printer.current_job_id }}
+                    {% else %}
+                    Ready for assignment.
+                    {% endif %}
+                </p>
+                <div class="d-grid">
+                    <a href="{{ url_for('operator.printer_detail', id=printer.id) }}"
+                        class="btn btn-outline-primary btn-sm">Manage</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

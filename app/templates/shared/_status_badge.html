@@ -1,0 +1,17 @@
+{% macro status_badge(status) %}
+{% if status == 'new' or status == 'created' %}
+<span class="badge bg-info text-dark">{{ status|upper }}</span>
+{% elif status == 'review' or status == 'waiting' %}
+<span class="badge bg-warning text-dark">{{ status|upper }}</span>
+{% elif status == 'queued' %}
+<span class="badge bg-primary">{{ status|upper }}</span>
+{% elif status == 'printing' %}
+<span class="badge bg-purple spin-icon"><i class="bi bi-printer-fill"></i> {{ status|upper }}</span>
+{% elif status == 'done' or status == 'shipped' or status == 'completed' %}
+<span class="badge bg-success">{{ status|upper }}</span>
+{% elif status == 'failed' or status == 'error' or status == 'cancelled' %}
+<span class="badge bg-danger">{{ status|upper }}</span>
+{% else %}
+<span class="badge bg-secondary">{{ status|upper }}</span>
+{% endif %}
+{% endmacro %}
