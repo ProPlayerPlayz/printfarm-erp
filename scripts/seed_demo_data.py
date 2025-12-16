@@ -79,13 +79,26 @@ def seed_data():
             db.session.commit()
             print("Created demo customer and orders.")
 
-        # 5. User (Operator)
+        # 5. Internal Users (Operator, Ops, Admin)
         if not User.query.filter_by(email="operator@demo.com").first():
             op = User(name="Demo Operator", email="operator@demo.com", role=UserRole.OPERATOR)
             op.set_password("password")
             db.session.add(op)
-            db.session.commit()
             print("Created demo operator.")
+        
+        if not User.query.filter_by(email="ops@demo.com").first():
+            ops = User(name="Ops Manager", email="ops@demo.com", role=UserRole.OPS_MANAGER)
+            ops.set_password("password")
+            db.session.add(ops)
+            print("Created demo ops manager.")
+            
+        if not User.query.filter_by(email="admin@demo.com").first():
+            adm = User(name="System Admin", email="admin@demo.com", role=UserRole.ADMIN)
+            adm.set_password("password")
+            db.session.add(adm)
+            print("Created demo admin.")
+            
+        db.session.commit()
 
         print("Seeding complete.")
 
