@@ -7,6 +7,14 @@
     <hr>
 
     <ul class="nav nav-pills flex-column mb-auto">
+        {% if current_user.role in ['admin', 'ops_manager', 'operator'] %}
+        <li class="nav-item">
+            <a href="{{ url_for('analytics.dashboard') }}"
+                class="nav-link text-white {{ 'active' if request.endpoint.startswith('analytics') }}">
+                <i class="bi bi-bar-chart-line me-2"></i> Analytics
+            </a>
+        </li>
+        {% endif %}
         {% if current_user.role == 'operator' or current_user.role == 'admin' %}
         <li class="nav-item">
             <a href="{{ url_for('operator.dashboard') }}"

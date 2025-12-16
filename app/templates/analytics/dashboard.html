@@ -1,0 +1,80 @@
+{% extends "internal/base_internal.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Analytics Dashboard</h1>
+        <form id="filterForm" class="d-flex gap-2">
+            <select name="days" id="daysFilter" class="form-select">
+                <option value="7">Last 7 Days</option>
+                <option value="30" selected>Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
+            </select>
+            <select name="printer_id" id="printerFilter" class="form-select">
+                <option value="">All Printers</option>
+                {% for printer in printers %}
+                <option value="{{ printer.id }}">{{ printer.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" id="refreshBtn" class="btn btn-primary">Refresh</button>
+        </form>
+    </div>
+
+    <div class="row">
+        <!-- Orders Per Day -->
+        <div class="col-md-8 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Orders Per Day</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Status -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Order Status</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Filament Usage -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Filament Usage (Grams)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="filamentChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Printer Utilization -->
+        <div class="col-md-8 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Printer Utilization</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="printerChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+{% endblock %}

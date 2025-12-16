@@ -15,9 +15,18 @@ def consume_filament(filament_id, grams):
     """
     Deducts stock. Caller handles transaction/commit or adds to session.
     """
-    filament = Filament.query.get(filament_id)
+    # Use with_for_update to lock the row
+    # SQLite note: FOR UPDATE is not supported, so this might be ignored or handled by generic file locking.
+    filament = Filament.query.filter_by(id=filament_id).with_for_update().first()
     if filament:
+        # Check stock again under lock? 
+        # Actually with_for_update works on the initial query.
+        # But here we are getting by ID.
+        # Ideally: db.session.query(Filament).with_for_update().filter_by(id=filament_id).first()
+        
         filament.stock_grams = max(0, filament.stock_grams - grams)
+        # Note: Caller commits. If caller (finish_job) doesn't commit immediately, lock is held.
+        # This is good.
         return True
     return False
 

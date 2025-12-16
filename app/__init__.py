@@ -27,6 +27,12 @@ def create_app(config_name='default'):
 
     from app.admin.routes import admin_bp
     app.register_blueprint(admin_bp, url_prefix='/admin')
+
+    from app.blueprints.analytics.routes import analytics_bp
+    app.register_blueprint(analytics_bp, url_prefix='/analytics')
+
+    from app.blueprints.main.routes import main_bp
+    app.register_blueprint(main_bp, url_prefix='/')
     
     # Root redirect (optional, or handle in nginx)
     @app.route('/')

@@ -30,12 +30,12 @@ def order_new():
             flash('No files selected', 'danger')
             return render_template('customer/order_new.html', form=form)
 
-        # Create Order
+        # Create Order in REVIEW status
         order = Order(
             customer_user_id=current_user.id,
-            status=OrderStatus.NEW,
-            priority=False, # Could add to form
-            shipping_address=current_user.customer_profile.address_line1 if current_user.customer_profile else "No Address", # Simplify
+            status=OrderStatus.REVIEW,
+            priority=False, 
+            shipping_address=current_user.customer_profile.address_line1 if current_user.customer_profile else "No Address",
             created_at=db.func.now()
         )
         db.session.add(order)
@@ -50,7 +50,6 @@ def order_new():
                 
                 # Create Job
                 # Estimate placeholder: 50g, 60min default
-                # Real implementation would parse STL here
                 est_grams = 50 
                 est_mins = 60
                 qty = form.quantity.data
@@ -73,19 +72,53 @@ def order_new():
         
         order.total_estimated_price = total_estimate
         
-        log_action(current_user.id, "create_order", "Order", order.id)
+        # Don't log create yet? Or log 'draft'?
         db.session.commit()
         
-        flash(f'Order #{order.id} placed successfully!', 'success')
-        return redirect(url_for('customer.order_detail', id=order.id))
+        return redirect(url_for('customer.order_confirm', id=order.id))
 
     return render_template('customer/order_new.html', form=form)
+
+@customer_bp.route('/order/<int:id>/confirm', methods=['GET', 'POST'])
+@login_required
+@role_required(UserRole.CUSTOMER)
+def order_confirm(id):
+    order = Order.query.get_or_404(id)
+    if order.customer_user_id != current_user.id:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('customer.orders'))
+        
+    if order.status != OrderStatus.REVIEW:
+        # If already confirmed, just go to detail
+        return redirect(url_for('customer.order_detail', id=order.id))
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'confirm':
+            order.status = OrderStatus.NEW
+            log_action(current_user.id, "create_order", "Order", order.id)
+            db.session.commit()
+            flash(f'Order #{order.id} confirmed and placed!', 'success')
+            return redirect(url_for('customer.orders'))
+        elif action == 'cancel':
+            db.session.delete(order) # Cascades jobs hopefully? check models. Yes backref cascade.
+            db.session.commit()
+            flash('Order cancelled.', 'info')
+            return redirect(url_for('customer.home'))
+            
+    shipping_cost = 15.00
+    grand_total = float(order.total_estimated_price) + shipping_cost
+    return render_template('customer/order_confirmation.html', order=order, shipping_cost=shipping_cost, grand_total=grand_total)
 
 @customer_bp.route('/orders')
 @login_required
 @role_required(UserRole.CUSTOMER)
 def orders():
-    user_orders = Order.query.filter_by(customer_user_id=current_user.id).order_by(Order.created_at.desc()).all()
+    # Exclude REVIEW status from main list?
+    user_orders = Order.query.filter(
+        Order.customer_user_id == current_user.id,
+        Order.status != OrderStatus.REVIEW
+    ).order_by(Order.created_at.desc()).all()
     return render_template('customer/orders.html', orders=user_orders)
 
 @customer_bp.route('/orders/<int:id>')

@@ -118,6 +118,11 @@ class Order(db.Model):
     jobs = db.relationship('PrintJob', backref='order', cascade='all, delete-orphan')
     shipment = db.relationship('Shipment', uselist=False, backref='order')
 
+    @property
+    def total_weight(self):
+        """Calculates total estimated weight of all jobs in the order."""
+        return sum(job.estimated_material_grams * job.quantity for job in self.jobs)
+
 class PrintJob(db.Model):
     __tablename__ = 'print_jobs'
     id = db.Column(db.Integer, primary_key=True)

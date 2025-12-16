@@ -9,6 +9,7 @@ This guide explains how to deploy the Print Farm ERP for remote access using **D
 
 - A computer running the ERP (Windows/Linux/Mac).
 - Internet access with router admin privileges.
+- **Internet Access**: Required for the Analytics Dashboard to load Chart.js from CDN.
 - Python installed.
 
 ## 2. Setup DuckDNS

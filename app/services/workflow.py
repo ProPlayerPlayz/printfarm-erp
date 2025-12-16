@@ -24,11 +24,28 @@ def transition_order_status(order, new_status, user_id, commit=True):
         db.session.commit()
 
 def assign_job(job, printer_id, user_id):
-    printer = Printer.query.get(printer_id)
+    # Lock printer to prevent double assignment
+    printer = Printer.query.filter_by(id=printer_id).with_for_update().first()
+    
     if not printer:
         raise ValueError("Printer not found")
         
+    if printer.status != PrinterStatus.IDLE:
+        raise ValueError("Printer is not IDLE")
+    
+    if printer.current_job_id is not None:
+        raise ValueError("Printer already has a job")
+        
     job.assigned_printer_id = printer_id
+    printer.current_job_id = job.id # Link back
+    printer.status = PrinterStatus.PRINTING # Or keep IDLE until start? 
+    # Usually operator assigns, then walks over to start. 
+    # But if we assign, we reserve it. Let's say we reserve it.
+    # But wait, workflow says 'assign' -> 'start'.
+    # If we don't change status, another operator might assign.
+    # So we should probably mark it as 'ASSIGNED' or 'BUSY' or implicitly check current_job_id.
+    # The check `if printer.current_job_id is not None` handles this.
+    
     # Log assignment?
     db.session.commit()
 
@@ -60,10 +77,7 @@ def finish_job(job, user_id):
     # Prompt said: Filament: material_type, color. Job: material_type, color.
     # We find the first matching filament batch.
     
-    filament = db.session.query(type(job.printer).query.model).filter_by(
-        # Wait, I need Filament model import. Done.
-    ).all()
-    # Actually, let's fix the logic. We need to query Filament based on job attributes.
+
     from app.models import Filament
     filament = Filament.query.filter_by(
         material_type=job.material_type, 
@@ -90,12 +104,22 @@ def finish_job(job, user_id):
 def fail_job(job, user_id):
     job.status = JobStatus.FAILED
     if job.printer:
-        job.printer.status = PrinterStatus.ERROR
-        # Keep assigned but mark error? Or idle?
-        # Prompt says: printer -> printing, done -> idle, error -> ?
-        # Usually error means intervention needed.
+        job.printer.status = PrinterStatus.MAINTENANCE
+        job.printer.current_job_id = None # Detach job so printer can be fixed without clearing job manually? 
+                                          # Or keep attached? Prompt says "reassign to DIFFERENT printer".
+                                          # So we should probably detach.
     
     log_action(user_id, "fail_job", "PrintJob", job.id)
+    db.session.commit()
+
+def retry_job(job, user_id):
+    """
+    Resets a failed/cancelled job to WAITING status so it can be reassigned.
+    """
+    job.status = JobStatus.WAITING
+    job.assigned_printer_id = None # Clear assignment to allow reassignment
+    
+    log_action(user_id, "retry_job", "PrintJob", job.id)
     db.session.commit()
 
 def create_shipment(order_id, carrier, tracking, user_id):

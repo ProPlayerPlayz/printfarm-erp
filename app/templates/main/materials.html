@@ -1,0 +1,32 @@
+{% extends "customer/base_customer.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="display-4 fw-bold text-center mb-5">Our Materials</h1>
+
+    {% for type, items in materials.items() %}
+    <div class="mb-5">
+        <h2 class="border-bottom pb-2 mb-4">{{ type }}</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for item in items %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="{{ url_for('static', filename='img/' + item.image) }}" class="card-img-top p-3"
+                        alt="{{ item.color }} {{ type }} Filament"
+                        onerror="this.src='https://placehold.co/300x300?text={{ item.color }}+{{ type }}'">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ item.color }}</h5>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="text-center mt-5">
+        <p class="lead">Don't see what you need? We can order custom materials for large orders.</p>
+        <a href="#" class="btn btn-primary">Contact Us</a>
+    </div>
+</div>
+{% endblock %}

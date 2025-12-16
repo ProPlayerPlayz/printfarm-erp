@@ -58,6 +58,10 @@
                     <span>Total Items:</span>
                     <span class="fw-bold">{{ order.jobs|length }}</span>
                 </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Est. Weight:</span>
+                    <span class="fw-bold">{{ "%.0f"|format(order.total_weight) }}g</span>
+                </div>
                 <div class="d-flex justify-content-between mb-3">
                     <span>Est. Total:</span>
                     <span class="fw-bold text-primary fs-5">${{ order.total_estimated_price }}</span>

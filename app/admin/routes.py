@@ -75,20 +75,63 @@ def audit():
 # Prompt: "/admin/config/printers", "/admin/config/filaments"
 # I will implement basic list/add for printers as it's critical.
 
-@admin_bp.route('/config/printers', methods=['GET', 'POST'])
+@admin_bp.route('/printers')
 @login_required
 @role_required(UserRole.ADMIN)
-def config_printers():
+def printers():
+    printers = Printer.query.all()
+    return render_template('admin/printers.html', printers=printers)
+
+@admin_bp.route('/printers/new', methods=['GET', 'POST'])
+@login_required
+@role_required(UserRole.ADMIN)
+def printer_new():
     if request.method == 'POST':
         name = request.form.get('name')
         location = request.form.get('location')
-        if name:
-            p = Printer(name=name, location=location)
+        notes = request.form.get('notes')
+        
+        if Printer.query.filter_by(name=name).first():
+            flash('Printer name already exists.', 'danger')
+        else:
+            p = Printer(name=name, location=location, notes=notes)
             db.session.add(p)
             db.session.commit()
-            flash('Printer added', 'success')
+            log_action(current_user.id, "create_printer", "Printer", p.id, after={'name': name})
+            flash('Printer added successfully.', 'success')
+            return redirect(url_for('admin.printers'))
             
-    printers = Printer.query.all()
-    return render_template('operator/printers.html', printers=printers) # Reuse operator template or make new one? 
-                                                                    # Reuse is efficient but might lack admin controls.
-                                                                    # Let's just assume Admin uses Operator view for now or I'd duplicate code.
+    return render_template('admin/printer_form.html', title="Add New Printer", printer=None)
+
+@admin_bp.route('/printers/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+@role_required(UserRole.ADMIN)
+def printer_edit(id):
+    printer = Printer.query.get_or_404(id)
+    if request.method == 'POST':
+        printer.name = request.form.get('name')
+        printer.location = request.form.get('location')
+        printer.notes = request.form.get('notes')
+        
+        db.session.commit()
+        log_action(current_user.id, "update_printer", "Printer", printer.id, after={'name': printer.name})
+        flash('Printer updated successfully.', 'success')
+        return redirect(url_for('admin.printers'))
+        
+    return render_template('admin/printer_form.html', title="Edit Printer", printer=printer)
+
+@admin_bp.route('/printers/<int:id>/delete', methods=['POST'])
+@login_required
+@role_required(UserRole.ADMIN)
+def printer_delete(id):
+    printer = Printer.query.get_or_404(id)
+    # Check if has active jobs?
+    if printer.status in ['printing']:
+         flash('Cannot delete a printing printer. Stop job first.', 'danger')
+    else:
+        db.session.delete(printer)
+        db.session.commit()
+        log_action(current_user.id, "delete_printer", "Printer", id)
+        flash('Printer deleted.', 'success')
+        
+    return redirect(url_for('admin.printers'))

@@ -13,6 +13,7 @@
                 <th>Date</th>
                 <th>Status</th>
                 <th>Items</th>
+                <th class="text-end">Est. Weight</th>
                 <th class="text-end">Est. Price</th>
                 <th class="text-end">Action</th>
             </tr>
@@ -24,6 +25,7 @@
                 <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                 <td>{{ status_badge(order.status) }}</td>
                 <td>{{ order.jobs|length }} items</td>
+                <td class="text-end">{{ "%.0f"|format(order.total_weight) }}g</td>
                 <td class="text-end fw-bold">${{ order.total_estimated_price }}</td>
                 <td class="text-end">
                     <a href="{{ url_for('customer.order_detail', id=order.id) }}"

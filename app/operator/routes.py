@@ -36,6 +36,7 @@ def jobs():
     waiting_jobs = PrintJob.query.filter_by(status=JobStatus.WAITING).order_by(PrintJob.order_id.asc()).all()
     queued_jobs = PrintJob.query.filter_by(status=JobStatus.QUEUED).all()
     printing_jobs = PrintJob.query.filter_by(status=JobStatus.PRINTING).all()
+    failed_jobs = PrintJob.query.filter_by(status=JobStatus.FAILED).all()
     
     printers = Printer.query.all()
     
@@ -43,6 +44,7 @@ def jobs():
                            waiting_jobs=waiting_jobs, 
                            queued_jobs=queued_jobs,
                            printing_jobs=printing_jobs,
+                           failed_jobs=failed_jobs,
                            printers=printers)
 
 @operator_bp.route('/jobs/<int:job_id>/action', methods=['POST'])
@@ -70,8 +72,13 @@ def job_action(job_id):
             
         elif action == 'fail':
             fail_job(job, current_user.id)
-            flash(f'Job #{job_id} marked as failed.', 'warning')
+            flash(f'Job #{job_id} marked as failed. Printer set to Maintenance.', 'warning')
             
+        elif action == 'retry':
+             from app.services.workflow import retry_job
+             retry_job(job, current_user.id)
+             flash(f'Job #{job_id} reset to Waiting queue.', 'info')
+             
         elif action == 'queue':
              # Manual move to queue without printer? Or reset?
              job.status = JobStatus.QUEUED

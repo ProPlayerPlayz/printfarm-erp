@@ -7,6 +7,8 @@ A lightweight, role-based ERP system for managing a 3D printing farm. Built with
 - **Public Customer Portal**: Customers can upload STLs, get instant estimates, and track orders.
 - **Operator Portal**: Kanban-style job queue, printer status management, and job tracking.
 - **Ops Manager Portal**: Inventory management (filament/parts), shipment processing, and reorder suggestions.
+- **Analytics Dashboard**: Dynamic visualization of orders, filament usage, and printer utilization (Chart.js).
+- **Materials Page**: Public gallery showing available filament colors and types.
 - **Admin Portal**: User management, audit logs, and system configuration.
 - **Security**: Role-based access control, secure file uploads, and Nginx LAN restriction configurations.
 

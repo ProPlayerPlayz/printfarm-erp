@@ -1,0 +1,58 @@
+{% extends "internal/base_internal.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Printer Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('admin.printer_new') }}" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-lg"></i> Add New Printer
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Notes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for printer in printers %}
+            <tr>
+                <td>{{ printer.id }}</td>
+                <td>{{ printer.name }}</td>
+                <td>{{ printer.location }}</td>
+                <td>
+                    {% include 'shared/_status_badge.html' %}
+                    {# Need to pass status/text potentially if _status_badge expects specific vars,
+                    usually it expects 'status' var. Let's assume it works or use manual Badge #}
+                    <span class="badge bg-secondary">{{ printer.status }}</span>
+                </td>
+                <td>{{ printer.notes }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{{ url_for('admin.printer_edit', id=printer.id) }}"
+                            class="btn btn-sm btn-outline-primary">Edit</a>
+                        <form action="{{ url_for('admin.printer_delete', id=printer.id) }}" method="POST"
+                            onsubmit="return confirm('Are you sure?');" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center text-muted">No printers found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
